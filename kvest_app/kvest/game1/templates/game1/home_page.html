@@ -1,0 +1,70 @@
+{% extends 'game1/base.html' %}
+{% load static %}
+{% block header %}Hello{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'game1/css/homepage_style.css' %}">
+{% endblock %}
+{% block content %}
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-danger" role="alert" text-align=center>
+{{message}}
+</div>
+{% endfor %}
+{% endif %}
+
+
+<div class="container team_list">
+	<br>
+	<h2>Список команд</h2>
+	<div class="row">
+		{% for team in object_list %}
+		<div class="col-md-12 alert alert-info">
+			Название команды: {{team.name}}
+			<span id="{{team.id}}">Номер команды: {{team.id}}</span>
+			<!-- Button trigger modal -->
+			<button type="button" class="btn btn-primary ml-5" data-toggle="modal" data-target="#exampleModalCenter{{team.id}}">
+			  Присоединиться!
+			</button>
+			
+
+		</div>
+		<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter{{team.id}}" ta bindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalCenterTitle">Введите секретный ключ!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="{% url 'check_group_pass' group_id=team.id %}" type="POST">
+	      <div class="modal-body">
+	      	
+	      	{% csrf_token %}
+	        <input type="text" class="form-control" placeholder="секретный ключ" id="password" name="password" value="password">
+	        
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+	        <button type="submit" class="btn btn-primary">Подтвердить</button>
+	      </div>
+      </form>
+    </div>
+  </div>
+</div>
+		{% endfor %}
+			
+	</div>
+</div>
+
+
+
+
+
+
+
+
+{% endblock %}

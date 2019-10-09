@@ -1,0 +1,94 @@
+{% extends 'game1/base.html' %}
+{% load static %}
+
+
+{% block css %}
+<link rel="stylesheet" href="{% static "game1/css/login_style.css" %}">
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+
+{% block content %}
+
+    {% if request.user.is_authenticated %}
+        <meta http-equiv='refresh' content='0; URL={% url "home"%}'>
+    {% endif %}
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-danger" role="alert" text-align=center>
+            {{message}}    
+        </div>
+        {% endfor %}
+    {% endif %}
+
+        
+
+         {% if form.errors %}
+         <div class="alert alert-danger" role="alert" text-align=center>
+            <p>Your username and password didn't match. Please try again.</p>    
+        </div>
+        {% endif %}
+
+        {% if next %}
+            {% if user.is_authenticated %}
+            <div class="alert alert-danger" role="alert" text-align=center>
+                <p>Your account doesn't have access to this page. To proceed,
+                please login with an account that has access.</p>
+            </div>
+            {% else %}
+            <div class="alert alert-danger" role="alert" text-align=center>
+                <p>Please login to see this page.</p>
+            </div>
+            {% endif %}
+        {% endif %}
+
+        <div class="container">
+    <div class="d-flex justify-content-center h-100">
+        <div class="card">
+            <div class="card-header">
+                <h3>Sign In</h3>
+                <div class="d-flex justify-content-end social_icon">
+                    <span><i class="fab fa-facebook"></i></span>
+                    <span><i class="fab fa-vk"></i></span>
+                    <span><i class="fab fa-twitter"></i></span>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="post", action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <div class="input-group form-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="username" name="username">
+                        
+                    </div>
+                    <div class="input-group form-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-key"></i></span>
+                        </div>
+                        <input type="password" class="form-control" placeholder="password" name="password">
+                    </div>
+                    <div class="row align-items-center remember">
+                        <input type="checkbox">Remember Me
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="login" class="btn float-right login_btn">
+                        <input type="hidden" name="next" value="{{ next }}">
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-center links">
+                    Don't have an account?<a href="{% url 'signup' %}">Sign Up</a>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <a href="#">Forgot your password?</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+       
+{% endblock%}
