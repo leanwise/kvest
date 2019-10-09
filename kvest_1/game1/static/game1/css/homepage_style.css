@@ -1,0 +1,14 @@
+html, body{
+background-image: url('https://www.look.com.ua/large/201310/81608.jpg');
+background-size: cover;
+background-repeat: no-repeat;
+height: 100%;
+font-family: 'Numans', sans-serif;
+}
+
+.team_list{
+	background-color: white;
+	height: 100%;
+	background-repeat: no-repeat;
+	background-size: cover;
+}

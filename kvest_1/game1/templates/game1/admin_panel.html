@@ -1,0 +1,17 @@
+{% extends 'game1/base.html' %}
+
+{% block content %}
+{% for answer in answers %}
+	{% if answer.is_right is None %}
+	<div class="alert alert-primary">
+		Team:{{answer.team.name}} | 
+		Team progress:{{answer.team.progress}} |
+		Mission step: {{answer.step}} |
+		Is right:{{answer.is_right}} |
+	
+		<a href="{% url 'answerDetail' answer_id=answer.pk  %}">Detail</a>
+	</div>
+	
+	{% endif %}
+{% endfor %}
+{% endblock %}
