@@ -143,10 +143,10 @@ def post_answer(request):
 	team = gamer.team
 	answerToCheck = models.AnswerToCheck(selfie=selfie, place=place, step=team.progress, team=team)
 	answerToCheck.save()
-        return HttpResponse("True")
+	return HttpResponse("True")
 	
 
-@login_request
+@login_required
 def check_answer(request):
     id = request.GET.get('answer_id')
     answer_object = models.AnswerToCheck.objects.get(pk=id)

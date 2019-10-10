@@ -32,6 +32,7 @@ $.ajaxSetup({
 });
 
 function send_answer(){
+	document.getElementById('get_mission').setAttribute('disabled', 'disabled');
 	if(answer.selfie && answer.place){
 		var json_data = JSON.stringify({Answers:answer});
 	$.ajax({
@@ -48,10 +49,10 @@ function send_answer(){
                         url:'/check_answer',
                         success: function(data){
                             if(data=="True"){
-                                location.reload()
+                                location.reload();
                             }
                             else{
-                                location.reload()
+                                location.reload();
                             }
                         }
                     });
