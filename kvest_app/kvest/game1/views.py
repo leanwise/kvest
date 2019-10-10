@@ -116,7 +116,6 @@ def game_page(request, team_id):
 		else:
 			messages.add_message(request, messages.ERROR, 'You are not from this team!')
 			return redirect('home')
-	#User isnt Gamer, so, we ll check pass of group and make it for us
 	else:
 		#check pass group
 		gamer = models.Gamer(user=request.user, team=models.Team.objects.get(id=team_id))
@@ -127,9 +126,7 @@ def finish(request):
 
 
 @login_required
-def get_answer(request):
-	#
-
+def post_answer(request):
 	#Receive images in json, base64, jpeg
 	print(request.body.decode())
 	received_json_data = json.loads(request.body.decode())
@@ -146,23 +143,20 @@ def get_answer(request):
 	team = gamer.team
 	answerToCheck = models.AnswerToCheck(selfie=selfie, place=place, step=team.progress, team=team)
 	answerToCheck.save()
+        return HttpResponse("True")
 	
-	#Check if answer is True or false, by updating the statement of answer
-	while(models.AnswerToCheck.objects.get(pk=answerToCheck.pk).check_answer() == None ):
-		#time.sleep(3) to unfreeze server
-		time.sleep(3)
-		continue
-	data_to_send = ""
 
-	if(models.AnswerToCheck.objects.get(pk=answerToCheck.pk).check_answer() == True):
-		team_to_update = models.Team.objects.get(pk=team.pk)
-		team_to_update.progress = team.progress+1
-		team_to_update.save()
-	else:
-		pass
-
-	return HttpResponse(models.AnswerToCheck.objects.get(pk=answerToCheck.pk).check_answer())
-
+@login_request
+def check_answer(request):
+    id = request.GET.get('answer_id')
+    answer_object = models.AnswerToCheck.objects.get(pk=id)
+    answer_result = answer_object.check_answer()
+    if(answer_result):
+       team = models.Team.objects.get(user=request.user)
+       team.progress = team.progress+1
+       team.save()
+    return HttpResponse(answer_result)
+   
 
 def signup(request):
 	if(request.user.is_authenticated):

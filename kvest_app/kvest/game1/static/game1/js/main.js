@@ -36,14 +36,25 @@ function send_answer(){
 		var json_data = JSON.stringify({Answers:answer});
 	$.ajax({
 			type: "POST",
-			url:'/get_answer',
+			url:'/post_answer',
 			data:json_data,
 			contentType: "application/json; charset=utf-8",
 			data_type: 'json',
 			
 			success: function(data){
 				if(data == "True"){
-					location.reload();
+                    $.ajax({
+                        type: "GET",
+                        url:'/check_answer',
+                        success: function(data){
+                            if(data=="True"){
+                                location.reload()
+                            }
+                            else{
+                                location.reload()
+                            }
+                        }
+                    });
 				}else{
 					
 					location.reload();

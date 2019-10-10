@@ -7,7 +7,8 @@ from django.conf import settings # new
 urlpatterns = [
 	path('', views.TeamList, name='home'),
 	path('game/<int:team_id>', views.game_page, name='game'),
-	path('get_answer', views.get_answer),
+	path('post_answer', views.post_answer),
+        path('check_answer', views.check_answer),
 	path('accounts', include("django.contrib.auth.urls")),
 	path('accounts/login', auth_views.LoginView.as_view(template_name='game1/login.html'), name='login'),
 	path('accounts/login/', auth_views.LoginView.as_view(template_name='game1/login.html'), name='login'),

@@ -19,7 +19,7 @@
 	<br>
 	<h2>Список команд</h2>
 	<div class="row">
-		{% for team in object_list %}
+		{% for team in object_context %}
 		<div class="col-md-12 alert alert-info">
 			Название команды: {{team.name}}
 			<span id="{{team.id}}">Номер команды: {{team.id}}</span>
@@ -44,7 +44,7 @@
 	      <div class="modal-body">
 	      	
 	      	{% csrf_token %}
-	        <input type="text" class="form-control" placeholder="секретный ключ" id="password" name="password" value="password">
+	        <input type="text" class="form-control" placeholder="секретный ключ" id="password" name="password">
 	        
 	      </div>
 	      <div class="modal-footer">
