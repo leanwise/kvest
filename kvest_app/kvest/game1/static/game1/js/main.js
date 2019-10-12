@@ -70,13 +70,17 @@ function get_answer(data){
 			// May be show some message before
 
 			var data_3 = response_3[0];
-			$('#exampleModalCenter').modal('show');
-			$('#exampleModalCenter').on('shown.bs.modal', function(e){
-				document.getElementById('modal-body').innerHTML = "Ключ: lalala";
-			});
-			$('#exampleModalCenter').on('hidden.bs.modal', function(e){
+			if(data_3.state=="Success"){
+				$('#exampleModalCenter').modal('show');
+				$('#exampleModalCenter').on('shown.bs.modal', function(e){
+					document.getElementById('modal-body').innerHTML = "Ключ: lalala";
+				});
+				$('#exampleModalCenter').on('hidden.bs.modal', function(e){
+					location.reload();
+				});
+			}else if(data_3.state=="Failed"){
 				location.reload();
-			});
+			}
 			
 									
 		}
@@ -124,7 +128,7 @@ $('#get_mission').on('click', function(){
 								}
 								else if(data_2.state==false){
 									clearInterval(checkAnswer);
-									location.reload();
+									get_answer(data);
 
 								}
 								else if(data_2.state==null){
