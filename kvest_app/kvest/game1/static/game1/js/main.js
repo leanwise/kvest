@@ -102,10 +102,11 @@ function disable_all(){
 
 
 $('#get_mission').on('click', function(){
-	disable_all();
-	document.getElementById('msg').innerHTML="Ожидайте!";
+	
 	if(answer.selfie && answer.place)
 	{
+		disable_all();
+	document.getElementById('msg').innerHTML="Ожидайте!";
 		var data = JSON.stringify({Answers:answer});
 		$.ajax({
 			type: "POST",

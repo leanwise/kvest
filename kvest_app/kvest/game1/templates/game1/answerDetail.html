@@ -6,7 +6,7 @@
 <img src="{{ answer.place.url }}" alt="" style="max-width:100%;"><br>
 <form action="{% url 'answerDetail' answer_id=answer.pk %}" method="POST">
 	{% csrf_token %}
-	<input type="text" placeholder="Comment for user" value='comment' name="comment">
+	<input type="text" placeholder="Comment for user" name="comment">
 <input class="btn btn-success" type="submit" value="Good!" name="good"></input>
 <input class="btn btn-danger" type="submit" value="Bad!" name="bad"></input>
 </form>
