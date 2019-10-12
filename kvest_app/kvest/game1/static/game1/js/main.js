@@ -1,6 +1,6 @@
 var answer = {selfie:'', place:''};
 
-
+// CSRF TOKEN
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -31,116 +31,125 @@ $.ajaxSetup({
     }
 });
 
-function send_answer(){
-	document.getElementById('get_mission').setAttribute('disabled', 'disabled');
-	if(answer.selfie && answer.place){
-		var json_data = JSON.stringify({Answers:answer});
+// END 
+
+
+function readURL(input, item){
+	console.log("a");
+	if(input.files && input.files[0]){
+
+		var reader = new FileReader();
+		reader.onload = function(e){
+			if(item == 'selfie')
+				answer.selfie = e.target.result;
+			if(item == 'place')
+				answer.place = e.target.result;
+			console.log(answer);
+		}
+		reader.readAsDataURL(input.files[0]);
+	}
+}
+
+
+$('#selfie').change(function(){
+	readURL(this, 'selfie');
+});
+
+$('#place').change(function(){
+	readURL(this, 'place');
+});
+
+function get_answer(data){
 	$.ajax({
+		type: "POST",
+		url: 'increment_progress',
+		data: JSON.stringify({answer_id: data.id}),
+		contentType:"application/json; charset=utf-8",
+		data_type: 'json',
+		success: function(response_3){
+			// May be show some message before
+
+			var data_3 = response_3[0];
+			$('#exampleModalCenter').modal('show');
+			$('#exampleModalCenter').on('shown.bs.modal', function(e){
+				document.getElementById('modal-body').innerHTML = "Ключ: lalala";
+			});
+			$('#exampleModalCenter').on('hidden.bs.modal', function(e){
+				location.reload();
+			});
+			
+									
+		}
+	});
+}
+
+function disable_all(){
+			var selfie = document.getElementById('selfie').setAttribute('disabled', 'disabled');
+			var place = document.getElementById('place').setAttribute('disabled', 'disabled');
+			var get = document.getElementById('get_mission').setAttribute('disabled', 'disabled');
+			var reset = document.getElementById('reset_btn').setAttribute('disabled', 'disabled');
+		}
+
+
+$('#get_mission').on('click', function(){
+	disable_all();
+	document.getElementById('msg').innerHTML="Ожидайте!";
+	if(answer.selfie && answer.place)
+	{
+		var data = JSON.stringify({Answers:answer});
+		$.ajax({
 			type: "POST",
-			url:'/post_answer',
-			data:json_data,
+			url: "post_answer",
+			data: data,
 			contentType: "application/json; charset=utf-8",
 			data_type: 'json',
-			
-			success: function(data){
-				if(data == "True"){
-                    $.ajax({
-                        type: "GET",
-                        url:'/check_answer',
-                        success: function(data){
-                            if(data=="True"){
-                                location.reload();
-                            }
-                            else{
-                                location.reload();
-                            }
-                        }
-                    });
-				}else{
+			success: function(response){
+				console.log(response[0]);
+				var data = response[0];
+				if(data.state=="Success")
+				{
+					console.log('1')
+					var checkAnswer = setInterval(function(){
+						$.ajax({
+							type:"POST",
+							url: "check_answer",
+							data: JSON.stringify({answer_id: data.id}),
+							contentType: "application/json; charset=utf-8",
+							data_type: 'json',
+							success: function(response_2){
+								var data_2 = response_2[0];
+								if(data_2.state==true){
+									clearInterval(checkAnswer);
+									get_answer(data);
+								}
+								else if(data_2.state==false){
+									clearInterval(checkAnswer);
+									location.reload();
+
+								}
+								else if(data_2.state==null){
+
+								}
+							}
+						});
+					}, 3000);
+
 					
-					location.reload();
+				}
+				else{
+					document.getElementById('error').innerHtml="Что-то пошло не так, попробуйте перезагрузить страницу!";
 				}
 			}
+
 		});
-	}else{
-		document.getElementById("error").innerText = "Take a photos!";
 	}
-	
-}
-
-
-function take_selfie(){
-		// take snapshot and get image data
-		 Webcam.freeze( function(data_uri) {
-		  // display results in page
-		  	document.getElementById('selfie_camera').innerHTML = 
-		 	'<img src="'+data_uri+'"/>';
-		  	} 
-		  );
+	else{
+		document.getElementById('error').style.display = "block";
 	}
 
-function take_place(){
-	Webcam.freeze(function(data_uri){
-			document.getElementById('place_camera').innerHTML = 
-			'<img src="'+data_uri+'"/>';
-		}
-	);
-}
-
-function selfie_reset()
-{
-	$("#exampleModalCenter").modal("hide");
-	Webcam.snap(function(data_uri){
-		answer.selfie = data_uri;
-	});
-	Webcam.reset();
-	document.getElementById('selfie_btn').innerHTML='OK Make selfie';
-}
-
-function place_reset()
-{
-	$("#placeModalCenter").modal("hide");
-	Webcam.snap(function(data_uri){
-		answer.place = data_uri;
-	});
-	Webcam.reset();
-	document.getElementById('place_btn').innerHTML = 'OK Make place photo';
-}
-
-function delete_photos(){
-	if(answer.selfie){
-		answer.selfie = "";
-		document.getElementById('selfie_btn').innerHTML = 'Make selfie';
-	}
-	if(answer.place){
-		answer.place = "";
-		document.getElementById('place_btn').innerHTML = 'Make place photo';
-	}
-	
-}
-
-$('#selfie_btn').on('click', function(){
-	$('#exampleModalCenter').modal();
-	Webcam.set({
-		width:470,
-		height:240,
-	});
-	Webcam.attach('#selfie_camera');
 });
 
-$('#exampleModalCenter').on('hidden.bs.modal', function(){
-	Webcam.reset()
-});
 
-$("#place_btn").on('click', function(){
-	$('#placeModalCenter').modal();
-	Webcam.set({
-		width:470,
-		height:240,
-	});
-	Webcam.attach("#place_camera")
-});
 
-$('#placeModalCenter').on('hidden.bs.modal', function(){
-	Webcam.reset()
-});
+
+

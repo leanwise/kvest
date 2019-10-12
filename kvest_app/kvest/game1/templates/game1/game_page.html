@@ -9,6 +9,10 @@
 
 {% block content %}
 
+
+	<div class="alert alert-warning" id="error" role="alert" style="display:None;">
+		Сделайте фотографии!
+	</div>
 	<div class="container mt-4">
 		<div class="col-md-12">
 			{% if messages %}
@@ -18,120 +22,107 @@
 				</div>
 				{% endfor %}
 			{% endif %}
-			<h3 class="text-center">Mission Name #{{mission_id}}</h3>
+			
+			<h3 class="text-center">Название миссии #{{mission_id}}</h3>
 			
 			<h3 id="time"></h3>
+			{# Time script #}
 			<script>
-			var finish_time = "{{finish}}";
-			
-			var deadline = new Date(finish_time).getTime();
+				var finish_time = "{{finish}}";
+				
+				var deadline = new Date(finish_time).getTime();
 
-			var x = setInterval(function() {
+				var x = setInterval(function() {
 
-				// Get today's date and time
-				var now = new Date().getTime();
+					// Get today's date and time
+					var now = new Date().getTime();
 
-				// Find the distance between now and the count down date
-				var distance = deadline - now
+					// Find the distance between now and the count down date
+					var distance = deadline - now
 
-				// Time calculations for days, hours, minutes and seconds
-				var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-				var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-				var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+					// Time calculations for days, hours, minutes and seconds
+					var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+					var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+					var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-				// Display the result in the element with id="demo"
-				document.getElementById("time").innerHTML ="Your time:" + hours + "h "
-				+ minutes + "m " + seconds + "s ";
+					// Display the result in the element with id="demo"
+					document.getElementById("time").innerHTML ="Время:" + hours + "h "
+					+ minutes + "m " + seconds + "s ";
 
-				// If the count down is finished, write some text
-				if (distance < 0) {
-					clearInterval(x);
-					document.getElementById("time").innerHTML = "EXPIRED";
-					}
-				}, 1000);
+					// If the count down is finished, write some text
+					if (distance < 0) {
+						clearInterval(x);
+						document.getElementById("time").innerHTML = "EXPIRED";
+						}
+					}, 1000);
 			</script>
+			{# END TIME SCRIPT #}
 		</div>
+
 		<div class="col-md-12"><img src="{{photo}}" alt="" style="max-width:100%;"></div><br>
 		<div class="col-md-12 text-center">
 			{# data-toggle="modal" data-target="#exampleModalCenter" #}
-			<p id="indicator"></p>
-			<button type="button" class="btn btn-primary" id="selfie_btn">Make selfie</button>
-			<button type="button" class="btn btn-secondary" id="place_btn">Make place photo</button>
-			<button type="button" class="btn btn-danger" onclick="delete_photos()">Remove photos</button>
+			
+			{# <button type="button" class="btn btn-primary" id="selfie_btn">Make selfie</button> #}
+			{# <button type="button" class="btn btn-secondary" id="place_btn">Make place photo</button> #}
+			{# <button type="button" class="btn btn-danger" onclick="delete_photos()">Remove photos</button> #}
+			{# SELFIE #}
+
+
+			{# <input type="file" name="file" id="file" class="inputfile"/> #}
+			<input type="file" accept="image/*" name="selfie_file" id="selfie" class="inputfile"/ >
+			<label for="selfie" class="btn btn-primary btn-block" id="selfie_btn">Сделать селфи</label>
+
+			<input type="file" accept="image/*" name="place_file" id="place" class="inputfile" />
+			<label for="place" class="btn btn-info btn-block" id="place_btn">Сделать фотографию места</label>
+
+			<input type="button" class="btn btn-dark btn-block" value="Получить следующую миссию" id='get_mission'>
+			<button class="btn btn-danger btn-block" id="reset_btn">Сбросить фотографии</button>
+			<p id='msg'></p>
 		</div><br>
-		<div class="col-md-12 text-center">
-			{%csrf_token%}
-			<button class="btn-lg btn-success" onclick="send_answer()" id="get_mission">Get next mission</button>
-			<p><font color=red id="error">
-			
-			</font></p>
-			
-		</div>
 	</div>
 
-	<!-- The Selfie modal dialog -->
-	<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-	  <div class="modal-dialog modal-dialog-centered" role="document">
-	  	{# Content #}
-	    <div class="modal-content">
-	    	{# Modal Header #}
-	      <div class="modal-header">
-	        <h5 class="modal-title" id="exampleModalLongTitle">Take a selfie</h5>
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-	          <span aria-hidden="true">&times;</span>
-	        </button>
-	      </div>
-	      {# Modal Body #}
-	      <div class="modal-body">
-	        <div style="width:320px; height:240px;" id="selfie_camera"></div>
-	      </div>
-	      {# Modal Footer #}
-	      <div class="modal-footer">
-	      	<div class="col-md-4">
-	      		<button type="button" class="btn btn-primary" onclick="take_selfie()">Make a photo</button>
+	<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle" id="modal-title">Секретное послание!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-	      	</div>
-	        <div class="col-md-4">
-	        	<button type="button" class="btn btn-success" onclick="selfie_reset()">OK</button>
-	        </div>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	{# Ending #}
+	
 
-	<!-- The Place modal dialog -->
-	<div class="modal fade" id="placeModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-	  <div class="modal-dialog modal-dialog-centered" role="document">
-	  	{# Content #}
-	    <div class="modal-content">
-	    	{# Modal Header #}
-	      <div class="modal-header">
-	        <h5 class="modal-title" id="placeModalLongTitle">Take a selfie</h5>
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-	          <span aria-hidden="true">&times;</span>
-	        </button>
-	      </div>
-	      {# Modal Body #}
-	      <div class="modal-body">
-	        <div style="width:320px; height:240px;" id="place_camera"></div>
-	      </div>
-	      {# Modal Footer #}
-	      <div class="modal-footer">
-	      	<div class="col-md-4">
-	      		<button type="button" class="btn btn-primary" onclick="take_place()">Make a photo</button>
 
-	      	</div>
-	        <div class="col-md-4">
-	        	<button type="button" class="btn btn-success" onclick="place_reset()">OK</button>
-	        </div>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	{# Ending #}
+
 {% endblock %}
 
 {% block js %}
 	<script src="{% static "game1/js/main.js" %}" defer></script>
+	<script src="{% static "game1/js/webcam.min.js" %}" defer></script>
+	{% if is_blocked %}
+
+	<script>
+		function disable_all(){
+			var selfie = document.getElementById('selfie').setAttribute('disabled', 'disabled');
+			var place = document.getElementById('place').setAttribute('disabled', 'disabled');
+			var get = document.getElementById('get_mission').setAttribute('disabled', 'disabled');
+			var reset = document.getElementById('reset_btn').setAttribute('disabled', 'disabled');
+		}
+		disable_all();
+		document.getElementById('msg').innerHTML="Ожидайте!";
+	</script>
+	
+	{% endif %}
 {% endblock %}

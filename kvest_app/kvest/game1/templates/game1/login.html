@@ -14,81 +14,114 @@
         <meta http-equiv='refresh' content='0; URL={% url "home"%}'>
     {% endif %}
 
-    {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-danger" role="alert" text-align=center>
-            {{message}}    
-        </div>
-        {% endfor %}
-    {% endif %}
+   
 
-        
+<style>
+    html,
+body {
+  height: 100%;
+}
+
+body {
+  display: -ms-flexbox;
+  display: -webkit-box;
+  display: flex;
+  -ms-flex-align: center;
+  -ms-flex-pack: center;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: #f5f5f5;
+}
+
+.form-signin {
+  width: 100%;
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+.form-signin .checkbox {
+  font-weight: 400;
+}
+.form-signin .form-control {
+  position: relative;
+  box-sizing: border-box;
+  height: auto;
+  padding: 10px;
+  font-size: 16px;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin input[type="text"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+</style>
+
+
+<div class="container">
+    <div class="d-flex justify-content-center h-100 text-center">
+       
+        <form class="form-signin" action="{% url 'login' %}" method="POST">
+            {% csrf_token %}
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-danger" role="alert" text-align=center>
+                    {{message}}    
+                </div>
+                {% endfor %}
+            {% endif %}
+
+         {# username password #}
 
          {% if form.errors %}
          <div class="alert alert-danger" role="alert" text-align=center>
-            <p>Your username and password didn't match. Please try again.</p>    
+            <p>Пароль и имя пользователя не совпадают. Попробуй еще раз!</p>    
         </div>
         {% endif %}
 
         {% if next %}
             {% if user.is_authenticated %}
             <div class="alert alert-danger" role="alert" text-align=center>
-                <p>Your account doesn't have access to this page. To proceed,
-                please login with an account that has access.</p>
+                <p>У тебя недостаточно прав для просмотра данной страницы!</p>
             </div>
             {% else %}
             <div class="alert alert-danger" role="alert" text-align=center>
-                <p>Please login to see this page.</p>
+                <p>Войди или зарегестрируйся для просмотра страницы!</p>
             </div>
             {% endif %}
         {% endif %}
 
-        <div class="container">
-    <div class="d-flex justify-content-center h-100">
-        <div class="card">
-            <div class="card-header">
-                <h3>Sign In</h3>
-                <div class="d-flex justify-content-end social_icon">
-                    <span><i class="fab fa-facebook"></i></span>
-                    <span><i class="fab fa-vk"></i></span>
-                    <span><i class="fab fa-twitter"></i></span>
-                </div>
-            </div>
-            <div class="card-body">
-                <form method="post", action="{% url 'login' %}">
-                    {% csrf_token %}
-                    <div class="input-group form-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fas fa-user"></i></span>
-                        </div>
-                        <input type="text" class="form-control" placeholder="username" name="username">
-                        
-                    </div>
-                    <div class="input-group form-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fas fa-key"></i></span>
-                        </div>
-                        <input type="password" class="form-control" placeholder="password" name="password">
-                    </div>
-                    <div class="row align-items-center remember">
-                        <input type="checkbox">Remember Me
-                    </div>
-                    <div class="form-group">
-                        <input type="submit" value="login" class="btn float-right login_btn">
-                        <input type="hidden" name="next" value="{{ next }}">
-                    </div>
-                </form>
-            </div>
-            <div class="card-footer">
-                <div class="d-flex justify-content-center links">
-                    Don't have an account?<a href="{% url 'signup' %}">Sign Up</a>
-                </div>
-                <div class="d-flex justify-content-center">
-                    <a href="#">Forgot your password?</a>
-                </div>
-            </div>
-        </div>
+          <img class="mb-4" src="https://images-na.ssl-images-amazon.com/images/I/61DQ2k1uOXL._SL1500_.jpg" alt="" width="72" height="72">
+          <h1 class="h3 mb-3 font-weight-normal">Оставь надежду, всяк сюда входящий</h1>
+          <label for="username" class="sr-only">Имя пользователя</label>
+          <input type="username" id="username" class="form-control" placeholder="Имя пользователя" required="" autofocus="" name='username'>
+          <label for="password" class="sr-only">Пароль</label>
+          <input type="password" id="password" class="form-control" placeholder="Пароль" required="" name='password'>
+          
+          <input class="btn btn-lg btn-dark btn-block" type="submit" value="Войти"></input><br>
+          или <br><a href="{% url 'signup' %}">Зарегестрироваться</a>
+          
+        </form>
+  
+
+
     </div>
 </div>
+
+
+
+
        
 {% endblock%}

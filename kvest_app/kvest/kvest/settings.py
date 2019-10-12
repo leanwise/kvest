@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '64@e8$$q2b6(5p!^$-vhhp2)$1()2dlua=)k+d()(9p8)+rbs6'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 
@@ -117,8 +117,10 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+# STATIC_URL = '/static/'
+# STATIC_ROOT = 'home/leanwise/kvest/kvest/static'
+
 STATIC_URL = '/static/'
-STATIC_ROOT = 'home/leanwise/kvest/kvest/static'
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'

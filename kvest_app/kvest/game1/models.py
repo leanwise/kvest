@@ -3,9 +3,12 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
+
+
 class Team(models.Model):
 	def __str__(self):
 		return self.name
+
 
 	id = models.AutoField(primary_key=True)
 	name = models.CharField('Team name', max_length=100)
@@ -13,6 +16,8 @@ class Team(models.Model):
 	start = models.DateTimeField()
 	finish = models.DateTimeField()
 	team_pass = models.CharField('pass', max_length=50, default="xxxxxxxxxxxxxxxxxxxxxxxxxx1111111111111")
+	is_blocked = models.BooleanField(default=False)
+	playerCount = models.IntegerField(default=0)
 
 class Mission(models.Model):
 	def __str__(self):

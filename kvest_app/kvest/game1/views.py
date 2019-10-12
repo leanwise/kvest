@@ -1,6 +1,6 @@
 import json, time, base64, datetime, pytz
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_protect
 from django.core.files.base import ContentFile
 from . import models
@@ -19,17 +19,24 @@ from django.contrib.auth.decorators import login_required
 @login_required
 def check_group_pass(request, group_id):
 	try:
+
 		gamer = models.Gamer.objects.get(user=request.user)
 		return redirect('game', team_id=group_id)
 	except:
 		password = request.GET.get('password')
 		my_team = models.Team.objects.get(pk=group_id)
-		if(my_team.team_pass == password):
-			gamer = models.Gamer(team = my_team, user=request.user)
-			gamer.save()
-			return redirect('game', team_id=group_id)
-		messages.add_message(request, messages.ERROR, 'Неправильный пароль!')
-		return redirect('home')
+		if(models.Gamer.objects.all().filter(team = my_team).count() < 8):
+			if(my_team.team_pass == password):
+				gamer = models.Gamer(team = my_team, user=request.user)
+				gamer.save()
+				my_team.playerCount += 1
+				my_team.save()
+				return redirect('game', team_id=group_id)
+			messages.add_message(request, messages.ERROR, 'Неправильный пароль!')
+			return redirect('home')
+		else:
+			messages.add_message(request, messages.ERROR, "В этой команде слишком много игроков!")
+			return redirect('home')
 
 
 
@@ -73,9 +80,11 @@ def TeamList(request):
 		gamer = get_object_or_404(models.Gamer, user=request.user)
 		return redirect('game', team_id=gamer.team.id)
 	except:
-
+		
 		teams = models.Team.objects.all()
-		return render(request ,'game1/home_page.html', {'object_context':teams})
+		object_context = {'teams':teams}
+		print(object_context)
+		return render(request ,'game1/home_page.html', object_context)
 
 @login_required
 def game_page(request, team_id):
@@ -111,7 +120,7 @@ def game_page(request, team_id):
 				
 				return redirect('finish')
 
-			return render(request, 'game1/game_page.html', {'mission_id':my_team.progress, 'finish': finish_time, 'photo':place_photo})
+			return render(request, 'game1/game_page.html', {'mission_id':my_team.progress, 'finish': finish_time, 'photo':place_photo, 'is_blocked':my_team.is_blocked})
 		#user is not from this team	
 		else:
 			messages.add_message(request, messages.ERROR, 'You are not from this team!')
@@ -127,8 +136,13 @@ def finish(request):
 
 @login_required
 def post_answer(request):
+	#block team
+	team = models.Gamer.objects.get(user=request.user).team
+	team.is_blocked=True
+	team.save()
+
+
 	#Receive images in json, base64, jpeg
-	print(request.body.decode())
 	received_json_data = json.loads(request.body.decode())
 	#Selfie img
 	format, selfie_img = received_json_data['Answers']['selfie'].split(';base64,') 
@@ -143,20 +157,39 @@ def post_answer(request):
 	team = gamer.team
 	answerToCheck = models.AnswerToCheck(selfie=selfie, place=place, step=team.progress, team=team)
 	answerToCheck.save()
-	return HttpResponse("True")
+	response = [{'state':'Success', 'id':answerToCheck.pk}]
+	return JsonResponse(response, safe=False)
 	
 
 @login_required
 def check_answer(request):
-    id = request.GET.get('answer_id')
-    answer_object = models.AnswerToCheck.objects.get(pk=id)
-    answer_result = answer_object.check_answer()
-    if(answer_result):
-       team = models.Team.objects.get(user=request.user)
-       team.progress = team.progress+1
-       team.save()
-    return HttpResponse(answer_result)
-   
+	received_json_data = json.loads(request.body.decode())
+	print(request.body.decode())
+	answer = models.AnswerToCheck.objects.get(pk=received_json_data['answer_id'])
+	response = [{'state':answer.is_right}]
+	return JsonResponse(response, safe=False)
+
+@login_required
+def increment_progress(request):
+	#unblock team
+	team = models.Gamer.objects.get(user=request.user).team
+	team.is_blocked=False
+	team.save()
+
+	received_json_data = json.loads(request.body.decode())
+	print(received_json_data)
+	answer = models.AnswerToCheck.objects.get(pk=received_json_data['answer_id'])
+	response = ''
+	if(answer.is_right == True):
+		gamer = models.Gamer.objects.get(user=request.user)
+		team = gamer.team
+		team.progress += 1
+		team.save()
+		response = [{'state':'Success'}]
+	else:
+		response = [{'state': 'Failed'}]
+	return JsonResponse(response, safe=False)
+
 
 def signup(request):
 	if(request.user.is_authenticated):
@@ -168,17 +201,17 @@ def signup(request):
 		password = request.POST.get('password')
 		password1 = request.POST.get('password1')
 		if(password != password1):
-			messages.add_message(request, messages.ERROR, 'Passwords are not equals')
+			messages.add_message(request, messages.ERROR, 'Пароли не совпадают!')
 			return redirect('signup')
 		try:
 			user = get_object_or_404(models.User, username=username)
-			my_mail = get_object_or_404(models.User, email=email)
+			
 			# existed_email = get_object_or_404(models.User, email=email)
 			if(user or my_mail):
-				messages.add_message(request, messages.ERROR, 'This user already exists!')
+				messages.add_message(request, messages.ERROR, 'Пользователь с указанными данными уже существует!')
 				return redirect('signup')
 		except:
-			user = User.objects.create_user(username, email, password)
+			user = User.objects.create_user(username, '', password)
 			user.save()
 			login(request, user)
 			return redirect('home')
