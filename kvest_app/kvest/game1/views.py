@@ -138,7 +138,8 @@ def finish(request):
 def post_answer(request):
 	#block team
 	team = models.Gamer.objects.get(user=request.user).team
-	team.is_blocked=True
+	if(team.is_blocked):
+		return redirect('home')
 	team.save()
 
 
