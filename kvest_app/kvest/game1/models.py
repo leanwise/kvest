@@ -45,6 +45,7 @@ class AnswerToCheck(models.Model):
 	step = models.IntegerField()
 	team = models.ForeignKey(Team, on_delete=models.CASCADE)
 	is_right = models.NullBooleanField(null=True)
+	comment = models.CharField(max_length=200, default="Неправильные фотографии! Попробуйте сделать еще.")
 
 
 

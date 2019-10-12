@@ -52,7 +52,7 @@ def moderatorDetail(request, answer_id):
 			return redirect('my_admin')
 		elif(bad == "Bad!"):
 			msg = request.POST.get('comment')
-			messages.add_message(request, messages.ERROR, msg)
+			answer.comment = msg
 			answer.is_right = False
 			answer.save()
 			return redirect('my_admin')
@@ -186,9 +186,9 @@ def increment_progress(request):
 		team = gamer.team
 		team.progress += 1
 		team.save()
-		response = [{'state':'Success'}]
+		response = [{'state':'Success', 'msg': answer.comment}]
 	else:
-		response = [{'state': 'Failed'}]
+		response = [{'state': 'Failed', 'msg': answer.comment}]
 	return JsonResponse(response, safe=False)
 
 

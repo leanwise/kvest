@@ -79,7 +79,13 @@ function get_answer(data){
 					location.reload();
 				});
 			}else if(data_3.state=="Failed"){
-				location.reload();
+				$('#exampleModalCenter').modal('show');
+				$('#exampleModalCenter').on('shown.bs.modal', function(e){
+					document.getElementById('modal-body').innerHTML = data_3.msg;
+				});
+				$('#exampleModalCenter').on('hidden.bs.modal', function(e){
+					location.reload();
+				});
 			}
 			
 									
