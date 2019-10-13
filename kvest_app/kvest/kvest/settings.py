@@ -121,6 +121,7 @@ USE_TZ = False
 # STATIC_ROOT = 'home/leanwise/kvest/kvest/static'
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'home/leanwise/site/kvest/kvest_app/static'
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
