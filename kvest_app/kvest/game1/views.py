@@ -115,7 +115,7 @@ def game_page(request, team_id):
 			now = pytz.utc.localize(now)
 			deadline = pytz.utc.localize(my_team.finish)
 			if(deadline < now):
-				return HttpResponse("Time is expired!")
+				return HttpResponse("Время истекло!")
 			#Then get mission
 			try:
 				my_mission = models.Mission.objects.get(step=my_team.progress, team=my_team)
