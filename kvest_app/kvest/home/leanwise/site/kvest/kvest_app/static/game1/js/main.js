@@ -52,10 +52,12 @@ function readURL(input, item){
 
 
 $('#selfie').change(function(){
+    document.getElementById("selfie_btn").innerHTML='Сделать селфи <i class="fas fa-check"></i>';
 	readURL(this, 'selfie');
 });
 
 $('#place').change(function(){
+    document.getElementById("place_btn").innerHTML='Сделать фотографию места <i class="fas fa-check"></i>';
 	readURL(this, 'place');
 });
 
@@ -97,7 +99,6 @@ function disable_all(){
 			var selfie = document.getElementById('selfie').setAttribute('disabled', 'disabled');
 			var place = document.getElementById('place').setAttribute('disabled', 'disabled');
 			var get = document.getElementById('get_mission').setAttribute('disabled', 'disabled');
-			var reset = document.getElementById('reset_btn').setAttribute('disabled', 'disabled');
 		}
 
 
