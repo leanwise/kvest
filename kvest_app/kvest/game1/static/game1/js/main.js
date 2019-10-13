@@ -73,7 +73,7 @@ function get_answer(data){
 			if(data_3.state=="Success"){
 				$('#exampleModalCenter').modal('show');
 				$('#exampleModalCenter').on('shown.bs.modal', function(e){
-					document.getElementById('modal-body').innerHTML = "Ключ: lalala";
+					document.getElementById('modal-body').innerHTML = data_3.msg;
 				});
 				$('#exampleModalCenter').on('hidden.bs.modal', function(e){
 					location.reload();
