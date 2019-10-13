@@ -46,12 +46,14 @@ def moderatorDetail(request, answer_id):
 	if(request.method == "POST"):
 		good = request.POST.get('good')
 		bad = request.POST.get('bad')
+		msg = request.POST.get('comment')
 		if(good == "Good!"):
 			answer.is_right = True
+			answer.comment = msg
 			answer.save()
 			return redirect('my_admin')
 		elif(bad == "Bad!"):
-			msg = request.POST.get('comment')
+			
 			answer.comment = msg
 			answer.is_right = False
 			answer.save()
