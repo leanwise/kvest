@@ -73,13 +73,7 @@ function get_answer(data){
 
 			var data_3 = response_3[0];
 			if(data_3.state=="Success"){
-				$('#exampleModalCenter').modal('show');
-				$('#exampleModalCenter').on('shown.bs.modal', function(e){
-					document.getElementById('modal-body').innerHTML = data_3.msg;
-				});
-				$('#exampleModalCenter').on('hidden.bs.modal', function(e){
-					location.reload();
-				});
+				
 			}else if(data_3.state=="Failed"){
 				$('#exampleModalCenter').modal('show');
 				$('#exampleModalCenter').on('shown.bs.modal', function(e){
@@ -106,8 +100,7 @@ $('#get_mission').on('click', function(){
 	
 	if(answer.selfie && answer.place)
 	{
-		disable_all();
-	document.getElementById('msg').innerHTML="Ожидайте!";
+		
 		var data = JSON.stringify({Answers:answer});
 		$.ajax({
 			type: "POST",
@@ -118,9 +111,11 @@ $('#get_mission').on('click', function(){
 			success: function(response){
 				console.log(response[0]);
 				var data = response[0];
+				console.log(data);
 				if(data.state=="Success")
 				{
-					console.log('1')
+					disable_all();
+					document.getElementById('msg').innerHTML="Ожидайте!";
 					var checkAnswer = setInterval(function(){
 						$.ajax({
 							type:"POST",
@@ -130,13 +125,27 @@ $('#get_mission').on('click', function(){
 							data_type: 'json',
 							success: function(response_2){
 								var data_2 = response_2[0];
+								console.log(data_2.state);
 								if(data_2.state==true){
 									clearInterval(checkAnswer);
-									get_answer(data);
+									$('#exampleModalCenter').modal('show');
+									$('#exampleModalCenter').on('shown.bs.modal', function(e){
+										document.getElementById('modal-body').innerHTML = data_2.msg;
+									});
+									$('#exampleModalCenter').on('hidden.bs.modal', function(e){
+										location.reload();
+									});
 								}
 								else if(data_2.state==false){
 									clearInterval(checkAnswer);
-									get_answer(data);
+									$('#exampleModalCenter').modal('show');
+									$('#exampleModalCenter').on('shown.bs.modal', function(e){
+										document.getElementById('exampleModalLongTitle').innerHTML = "Ошибка!";
+										document.getElementById('modal-body').innerHTML = data_2.msg;
+									});
+									$('#exampleModalCenter').on('hidden.bs.modal', function(e){
+										location.reload();
+									});
 
 								}
 								else if(data_2.state==null){

@@ -52,3 +52,7 @@ class Key(models.Model):
 	team = models.ForeignKey(Team, on_delete=models.CASCADE)
 	value = models.CharField(max_length=200)
 
+
+class Spike(models.Model):
+	answer = models.ForeignKey(AnswerToCheck, on_delete=models.CASCADE)
+	mission = models.ForeignKey(Mission, on_delete=models.CASCADE)

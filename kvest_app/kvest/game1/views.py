@@ -25,7 +25,7 @@ def check_group_pass(request, group_id):
 	except:
 		password = request.GET.get('password')
 		my_team = models.Team.objects.get(pk=group_id)
-		if(models.Gamer.objects.all().filter(team = my_team).count() < 8):
+		if(models.Gamer.objects.all().filter(team = my_team).count() < 9):
 			if(my_team.team_pass == password):
 				gamer = models.Gamer(team = my_team, user=request.user)
 				gamer.save()
@@ -38,12 +38,33 @@ def check_group_pass(request, group_id):
 			messages.add_message(request, messages.ERROR, "В этой команде слишком много игроков!")
 			return redirect('home')
 
+@login_required
+def increment_progress(request):
+	#unblock team
+	team = models.Gamer.objects.get(user=request.user).team
+	team.is_blocked=False
+	team.save()
+
+	received_json_data = json.loads(request.body.decode())
+	print(received_json_data)
+	answer = models.AnswerToCheck.objects.get(pk=received_json_data['answer_id'])
+	response = ''
+	if(answer.is_right == True):
+		gamer = models.Gamer.objects.get(user=request.user)
+		team = gamer.team
+		team.progress += 1
+		team.save()
+		response = [{'state':'Success', 'msg': answer.comment}]
+	else:
+		response = [{'state': 'Failed', 'msg': answer.comment}]
+	return JsonResponse(response, safe=False)
 
 
 @login_required
 def moderatorDetail(request, answer_id):
 	answer = models.AnswerToCheck.objects.get(pk=answer_id)
-	team = models.Gamer.objects.get(user=request.user).team
+	team = answer.team
+	mission = models.Mission.objects.get(team=team, step=team.progress)
 
 	if(request.method == "POST"):
 		good = request.POST.get('good')
@@ -54,16 +75,20 @@ def moderatorDetail(request, answer_id):
 			answer.comment = msg
 			answer.save()
 			models.Key(team=team, value=msg).save()
+			team.is_blocked = False
+			team.progress += 1
+			team.save()
 			return redirect('my_admin')
 		elif(bad == "Bad!"):
 			
 			answer.comment = msg
 			answer.is_right = False
 			answer.save()
+			team.is_blocked = False
+			team.save()
 			return redirect('my_admin')
 		else:
 			return redirect('my_admin')
-		return HttpResponse(good)
 	
 	return render(request, 'game1/answerDetail.html', {'answer':answer})
 
@@ -93,8 +118,6 @@ def TeamList(request):
 
 @login_required
 def game_page(request, team_id):
-	#TODO
-	#*Check if time isnt expired
 
 	#Check if user is a gamer
 	try:
@@ -124,8 +147,11 @@ def game_page(request, team_id):
 				#If mission isnt exist, then show message
 				
 				return redirect('finish')
+			answer_id = None
+			if(my_team.is_blocked==True):
+				answer_id = models.Spike.objects.get(mission=my_mission).answer.pk
 
-			return render(request, 'game1/game_page.html', {'name':my_mission.name,'zone':my_mission.zone,'mission_id':my_team.progress, 'finish': finish_time, 'photo':place_photo, 'is_blocked':my_team.is_blocked})
+			return render(request, 'game1/game_page.html', {'name':my_mission.name,'zone':my_mission.zone,'mission_id':my_team.progress, 'finish': finish_time, 'photo':place_photo, 'is_blocked':my_team.is_blocked,'answer_id':answer_id})
 		#user is not from this team	
 		else:
 			messages.add_message(request, messages.ERROR, 'You are not from this team!')
@@ -144,9 +170,10 @@ def post_answer(request):
 	#block team
 	team = models.Gamer.objects.get(user=request.user).team
 	if(team.is_blocked):
-		return JsonResponse({'state':'blocked'})
-	team.is_blocked=True
-	team.save()
+		print('blocked')
+		return JsonResponse([{'state': 'blocked'}], safe=False)
+	#Blocked first time
+	
 
 
 	#Receive images in json, base64, jpeg
@@ -165,6 +192,11 @@ def post_answer(request):
 	answerToCheck = models.AnswerToCheck(selfie=selfie, place=place, step=team.progress, team=team)
 	answerToCheck.save()
 	response = [{'state':'Success', 'id':answerToCheck.pk}]
+
+	team.is_blocked=True
+	team.save()
+	mission = models.Mission.objects.get(step=team.progress, team=team)
+	models.Spike(answer=answerToCheck, mission=mission).save()
 	return JsonResponse(response, safe=False)
 	
 
@@ -174,28 +206,10 @@ def check_answer(request):
 	print(request.body.decode())
 	answer = models.AnswerToCheck.objects.get(pk=received_json_data['answer_id'])
 	response = [{'state':answer.is_right}]
+	if(answer.is_right != None):
+		response = [{'state':answer.is_right, 'msg':answer.comment}]
 	return JsonResponse(response, safe=False)
 
-@login_required
-def increment_progress(request):
-	#unblock team
-	team = models.Gamer.objects.get(user=request.user).team
-	team.is_blocked=False
-	team.save()
-
-	received_json_data = json.loads(request.body.decode())
-	print(received_json_data)
-	answer = models.AnswerToCheck.objects.get(pk=received_json_data['answer_id'])
-	response = ''
-	if(answer.is_right == True):
-		gamer = models.Gamer.objects.get(user=request.user)
-		team = gamer.team
-		team.progress += 1
-		team.save()
-		response = [{'state':'Success', 'msg': answer.comment}]
-	else:
-		response = [{'state': 'Failed', 'msg': answer.comment}]
-	return JsonResponse(response, safe=False)
 
 
 def signup(request):
@@ -242,6 +256,10 @@ def keys(request):
 
 def faq(request):
 	return render(request, 'game1/faq.html', {})
+@login_required
+def check_if_blocked(request):
+	team = models.Gamer.objects.get(user=request.user).team
+	return JsonResponse([{'blocked':team.is_blocked}], safe=False)
 
 
 

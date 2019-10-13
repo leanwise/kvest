@@ -87,7 +87,7 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle" id="modal-title">Секретное послание!</h5>
+        <h5 class="modal-title" id="exampleModalLongTitle">Секретное послание!</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -111,6 +111,10 @@
 {% block js %}
 	<script src="{% static "game1/js/main.js" %}" defer></script>
 	<script src="{% static "game1/js/webcam.min.js" %}" defer></script>
+
+	
+
+
 	{% if is_blocked %}
 
 	<script>
@@ -118,11 +122,66 @@
 			var selfie = document.getElementById('selfie').setAttribute('disabled', 'disabled');
 			var place = document.getElementById('place').setAttribute('disabled', 'disabled');
 			var get = document.getElementById('get_mission').setAttribute('disabled', 'disabled');
-			var reset = document.getElementById('reset_btn').setAttribute('disabled', 'disabled');
 		}
 		disable_all();
-		document.getElementById('msg').innerHTML="Ожидайте!";
+		document.getElementById('msg').innerHTML="Ожидайте, ответ уже был послан!";
+		var checkAnswer = setInterval(function(){
+						$.ajax({
+							type:"POST",
+							url: "check_answer",
+							data: JSON.stringify({answer_id: '{{answer_id}}'}),
+							contentType: "application/json; charset=utf-8",
+							data_type: 'json',
+							success: function(response_2){
+								var data_2 = response_2[0];
+								console.log(data_2.state);
+								if(data_2.state==true){
+									clearInterval(checkAnswer);
+									$('#exampleModalCenter').modal('show');
+									$('#exampleModalCenter').on('shown.bs.modal', function(e){
+										document.getElementById('modal-body').innerHTML = data_2.msg;
+									});
+									$('#exampleModalCenter').on('hidden.bs.modal', function(e){
+										location.reload();
+									});
+								}
+								else if(data_2.state==false){
+									clearInterval(checkAnswer);
+									$('#exampleModalCenter').modal('show');
+									$('#exampleModalCenter').on('shown.bs.modal', function(e){
+										document.getElementById('exampleModalLongTitle').innerHTML = "Ошибка!";
+										document.getElementById('modal-body').innerHTML = data_2.msg;
+									});
+									$('#exampleModalCenter').on('hidden.bs.modal', function(e){
+										location.reload();
+									});
+
+								}
+								else if(data_2.state==null){
+
+								}
+							}
+						});
+					}, 3000);
 	</script>
-	
+	{% else %}
+	<script>
+	var if_blocked = setInterval(function(){
+						$.ajax({
+							type:"POST",
+							url: "check_if_blocked",
+							success: function(response){
+								var data = response[0];
+								if(data.blocked==true){
+									
+									location.reload();
+									clearInterval(if_blocked);
+								}else if(data.blocked==false){
+
+								}
+							}
+						});
+					}, 3000);
+	</script>
 	{% endif %}
 {% endblock %}

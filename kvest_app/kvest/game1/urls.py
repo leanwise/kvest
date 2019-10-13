@@ -13,7 +13,7 @@ urlpatterns = [
 
 	path('game/post_answer', views.post_answer, name="post_answer"),
 	path('game/check_answer', views.check_answer, name="check_answer"),
-	path('game/increment_progress', views.increment_progress, name="check_answer"),
+	path('game/check_if_blocked', views.check_if_blocked, name='if_blocked'),
 
 	path('game/zone', views.zone, name='zone'),
 	path('game/keys', views.keys, name='keys'),
