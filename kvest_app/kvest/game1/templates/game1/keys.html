@@ -1,0 +1,9 @@
+{% extends 'game1/base.html' %}
+{% load static %}
+
+{% block content %}
+<h3>Ключи:</h3>
+{% for key in keys %}
+<p>{{key.value}}</p>
+{% endfor %}
+{% endblock %}

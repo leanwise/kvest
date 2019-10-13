@@ -48,5 +48,7 @@ class AnswerToCheck(models.Model):
 	is_right = models.NullBooleanField(null=True)
 	comment = models.CharField(max_length=200, default="Неправильные фотографии! Попробуйте сделать еще.")
 
-
+class Key(models.Model):
+	team = models.ForeignKey(Team, on_delete=models.CASCADE)
+	value = models.CharField(max_length=200)
 

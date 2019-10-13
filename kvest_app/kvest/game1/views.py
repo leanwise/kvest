@@ -43,6 +43,8 @@ def check_group_pass(request, group_id):
 @login_required
 def moderatorDetail(request, answer_id):
 	answer = models.AnswerToCheck.objects.get(pk=answer_id)
+	team = models.Gamer.objects.get(user=request.user).team
+
 	if(request.method == "POST"):
 		good = request.POST.get('good')
 		bad = request.POST.get('bad')
@@ -51,6 +53,7 @@ def moderatorDetail(request, answer_id):
 			answer.is_right = True
 			answer.comment = msg
 			answer.save()
+			models.Key(team=team, value=msg).save()
 			return redirect('my_admin')
 		elif(bad == "Bad!"):
 			
@@ -122,7 +125,7 @@ def game_page(request, team_id):
 				
 				return redirect('finish')
 
-			return render(request, 'game1/game_page.html', {'mission_id':my_team.progress, 'finish': finish_time, 'photo':place_photo, 'is_blocked':my_team.is_blocked})
+			return render(request, 'game1/game_page.html', {'name':my_mission.name,'zone':my_mission.zone,'mission_id':my_team.progress, 'finish': finish_time, 'photo':place_photo, 'is_blocked':my_team.is_blocked})
 		#user is not from this team	
 		else:
 			messages.add_message(request, messages.ERROR, 'You are not from this team!')
@@ -141,7 +144,8 @@ def post_answer(request):
 	#block team
 	team = models.Gamer.objects.get(user=request.user).team
 	if(team.is_blocked):
-		return redirect('home')
+		return JsonResponse({'state':'blocked'})
+	team.is_blocked=True
 	team.save()
 
 
@@ -220,6 +224,24 @@ def signup(request):
 			return redirect('home')
 	
 	return render(request, 'game1/signup.html')
+
+
+def zone(request):
+	return render(request, 'game1/zone.html', {})
+
+
+@login_required
+def keys(request):
+	try:
+		gamer = models.Gamer.objects.get(user=request.user)
+	except:
+		return redirect('home')
+	team = gamer.team
+	keys = models.Key.objects.all().filter(team=team)
+	return render(request, 'game1/keys.html', {'keys':keys})
+
+def faq(request):
+	return render(request, 'game1/faq.html', {})
 
 
 

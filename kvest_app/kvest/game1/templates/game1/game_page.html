@@ -23,7 +23,8 @@
 				{% endfor %}
 			{% endif %}
 			
-			<h3 class="text-center">Название миссии #{{mission_id}}</h3>
+			<h3 class="text-center">{{name}} #{{mission_id}}</h3>
+			<h3 class="text-center">Зона:{{zone}}</h3>
 			
 			<h3 id="time"></h3>
 			{# Time script #}
@@ -59,7 +60,7 @@
 			{# END TIME SCRIPT #}
 		</div>
 
-		<div class="col-md-12"><img src="{{photo}}" alt="" style="max-width:100%;"></div><br>
+		<div class="col-md-12"><img src="{{photo}}" alt="" style="max-width:100%;" onclick="window.open(this.src);"></div><br>
 		<div class="col-md-12 text-center">
 			{# data-toggle="modal" data-target="#exampleModalCenter" #}
 			

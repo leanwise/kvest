@@ -148,8 +148,12 @@ $('#get_mission').on('click', function(){
 
 					
 				}
+				else if(data.state=="blocked"){
+					location.reload();
+					document.getElementById('msg').innerHTML="Ответ уже был послан!";
+				}
 				else{
-					document.getElementById('error').innerHtml="Что-то пошло не так, попробуйте перезагрузить страницу!";
+					document.getElementById('msg').innerHTML="Что-то пошло не так, попробуйте перезагрузить страницу!";
 				}
 			}
 
