@@ -115,7 +115,7 @@ def game_page(request, team_id):
 				return HttpResponse("Time is expired!")
 			#Then get mission
 			try:
-				my_mission = models.Mission.objects.get(step=my_team.progress)
+				my_mission = models.Mission.objects.get(step=my_team.progress, team=my_team)
 				place_photo = my_mission.img.url
 			except:
 				#If mission isnt exist, then show message
