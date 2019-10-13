@@ -1,0 +1,25 @@
+.inputfile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+.inputfile + label {
+	cursor: pointer; /* "hand" cursor */
+}
+
+	input:disabled {
+  background: #dddddd;
+}
+
+input:disabled+label {
+  cursor: not-allowed;
+  color: #ccc;
+}
+
+input[type=text]+label {
+  float: left;
+}
