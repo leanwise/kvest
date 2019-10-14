@@ -131,7 +131,7 @@ def game_page(request, team_id):
 		#check if user not from another team
 		if(my_boy.team.id == team_id):
 			my_team = models.Team.objects.get(pk=team_id)
-			start_time = my_team.start
+			start_time = my_team.start.isoformat()
 			finish_time = my_team.finish.isoformat()
 			#Check if time is expired
 			now = datetime.datetime.now()
@@ -149,9 +149,18 @@ def game_page(request, team_id):
 				return redirect('finish')
 			answer_id = None
 			if(my_team.is_blocked==True):
-				answer_id = models.Spike.objects.get(mission=my_mission).answer.pk
+                            answer_id = models.Spike.objects.get(mission=my_mission).answer.pk
 
-			return render(request, 'game1/game_page.html', {'name':my_mission.name,'zone':my_mission.zone,'mission_id':my_team.progress, 'finish': finish_time, 'photo':place_photo, 'is_blocked':my_team.is_blocked,'answer_id':answer_id})
+                        context = {}
+                        context['start'] = start_time
+                        context['name'] = my_mission.name
+                        context['zone'] = my_mission.zone
+                        context['mission_id'] = my_team.progress
+                        context['finish'] = finish_time
+                        context['photo'] = place_photo
+                        context['is_blocked'] = my_team.is_blocked
+                        context['answer_id'] = answer_id
+                    return render(request, 'game1/game_page.html', context)
 		#user is not from this team	
 		else:
 			messages.add_message(request, messages.ERROR, 'You are not from this team!')

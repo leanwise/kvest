@@ -30,13 +30,14 @@
 			{# Time script #}
 			<script>
 				var finish_time = "{{finish}}";
+                var start_time = "{{start}}";
 				
 				var deadline = new Date(finish_time).getTime();
 
 				var x = setInterval(function() {
 
 					// Get today's date and time
-					var now = new Date().getTime();
+					var now = new Date(start_time).getTime();
 
 					// Find the distance between now and the count down date
 					var distance = deadline - now
@@ -168,7 +169,7 @@
 	<script>
 	var if_blocked = setInterval(function(){
 						$.ajax({
-							type:"POST",
+							type:"GET",
 							url: "check_if_blocked",
 							success: function(response){
 								var data = response[0];
