@@ -152,7 +152,7 @@ def game_page(request, team_id):
 				answer_id = models.Spike.objects.get(mission=my_mission).answer.pk
 
 			context = {}
-			context['start'] = start_time
+			context['start'] = now.isoformat()
 			context['name'] = my_mission.name
 			context['zone'] = my_mission.zone
 			context['mission_id'] = my_team.progress

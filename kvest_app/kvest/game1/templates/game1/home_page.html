@@ -36,10 +36,15 @@
 
 					<th>{{team.name}}</th>
 					<th>{{team.playerCount}}/8</th>
-					<th><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter{{team.id}}">
-			  Присоединиться!
-			</button></th>
+                    <th>
+                            <a href="#" onclick="my_modal();">Присоединиться!</a>
+			</th>
 				</tr>
+    <script>
+        function my_modal(){
+            $('#exampleModalCenter{{team.id}}').modal();
+        }
+    </script>
 
 
 		
